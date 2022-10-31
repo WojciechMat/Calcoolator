@@ -136,7 +136,6 @@ void change(char *a, int from_base, int to_base, char *out){
         decichange(num, to_base, comp);       
         
         add(temp_out, comp, to_base, tab);
-        printf("%s", tab);
         strcpy(temp_out, tab);
 
         a_iter-=1;
@@ -230,11 +229,13 @@ void divide(char* a, char* b, int base, char *out){
     while(are_equal(temp, a) == 0 && strlen(comp) <= strlen(a)){
         add(comp, b, base, temp);
         strcpy(comp, temp);
+
         i++;
     }
     if(strlen(comp) > strlen(a)) return;
     decichange(i, base, out);
     return;
+    
 }
 
 
@@ -384,23 +385,5 @@ int main() {
 CLOSE:
     fclose(inf);
     fclose(outf);
-
-
-
-
-
-    /*int baset = 16;
-    char at[SIZE];
-    at[0] = 'F';
-    char* bt = "9";
-    char outt[SIZE];
-    //add(a, b, base, out);
-    //printf("%s", out);
-    //multiply(a, b, base, out);
-    power(at, bt, baset , outt);
-
-    printf("%s", outt);
-*/
-
     return 0;
 }
