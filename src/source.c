@@ -3,7 +3,9 @@
 #include<math.h>
 #include<stdio.h>
 #include<stdlib.h>
-const int SIZE = 41;
+const int SIZE = 82;
+//do zrobienia: czas obliczen
+
 char* nums = "0123456789ABCDEF";
 
 int val(char a){
@@ -51,12 +53,29 @@ void swap(char** a, char** b)
     *b = temp;
 
 }
-//dodawanie pisemne
-void add(char *a, char *b, int base, char *sum){
-    if(strlen(a) < strlen(b))
-    {
-        swap(&a, &b);
+int is_greater(char *greater, char *less){
+    if(strlen(greater) > strlen(less)) return 1;
+    if(strlen(greater) < strlen(less)) return 0;
+    int i = 0;
+    while(i < strlen(greater)){
+        if(val(greater[i]) > val(less[i])) return 1;
+        if(val(less[i]) > val(greater[i])) return 0;
+        i++;
     }
+    return 0;
+}
+//dodawanie pisemne
+void add(char *a_in, char *b_in, int base, char *sum){
+    int swapped = 0;
+    if(strlen(a_in) < strlen(b_in))
+    {
+        swap(&a_in, &b_in);
+        swapped = 1;
+    }
+    char a[SIZE];
+    char b[SIZE];
+    strcpy(a, a_in);
+    strcpy(b, b_in);
     int a_iter = strlen(a)-1;
     int b_iter = strlen(b)-1;
     int i = 0;
@@ -85,6 +104,9 @@ void add(char *a, char *b, int base, char *sum){
     if (car > 0){ sum[i] = nums[car]; i++;}
     sum[i] = '\0';
     turn(sum);
+    if(swapped){
+        swap(&a_in, &b_in);
+    } 
     return;
 }
 int change_to_int(char *a, int base){
@@ -93,7 +115,6 @@ int change_to_int(char *a, int base){
     int i = 0;
     while(iter >= 0){
         out += val(a[iter]) * pow(base, i);
-        if(out > 1000000) return -1;
         iter-=1;
         i++;
     }
@@ -106,7 +127,7 @@ int are_equal(char* a, char*b){
     }
     return 1;
 }
-void decichange (int a, int to_base, char* out){
+void change_f_int (int a, int to_base, char* out){
 
     int i = 0;
     int num = 0;        
@@ -133,7 +154,7 @@ void change(char *a, int from_base, int to_base, char *out){
     while ( a_iter >= 0 ){
         num = (val(a[a_iter]) *(int)pow(from_base, i));
         
-        decichange(num, to_base, comp);       
+        change_f_int(num, to_base, comp);       
         
         add(temp_out, comp, to_base, tab);
         strcpy(temp_out, tab);
@@ -146,11 +167,17 @@ void change(char *a, int from_base, int to_base, char *out){
     return;
 }   
 //mnozenie pisemne
-void multiply(char* a, char* b, int base, char *out){
-    if(strlen(a) < strlen(b))
+void multiply(char* a_in, char* b_in, int base, char *out){
+    int swapped = 0;
+    if(strlen(a_in) < strlen(b_in))
     {
-        swap(&a, &b);
+        swap(&a_in, &b_in);
+        swapped = 1;
     }
+    char a[SIZE];
+    char b[SIZE];
+    strcpy(a, a_in);
+    strcpy(b, b_in);
     int a_iter = strlen(a)-1;
     int b_iter = strlen(b)-1;
     int i = 0;
@@ -165,6 +192,8 @@ void multiply(char* a, char* b, int base, char *out){
     {
         if(b[b_iter] != '0'){
             i = 0;
+            car = 0;
+
             char comp[SIZE];
             for(int j = 0; j < k; j++){
                 comp[i] = '0';
@@ -176,6 +205,7 @@ void multiply(char* a, char* b, int base, char *out){
                 car = ((val(a[a_iter]) * val(b[b_iter])) +car) / base;
                 a_iter-=1;
                 comp[i] = nums[num];
+                
                 i++;
             } 
             if(car > 0){ comp[i] = nums[car]; i++; }
@@ -191,55 +221,131 @@ void multiply(char* a, char* b, int base, char *out){
 
     }
     strcpy(out, temp_out);
-
+    if(swapped){
+        swap(&a_in, &b_in);
+    }
     return;
 }
-//potegowanie - wielokrotne mnozenie(podstawowe)
-void power(char* a, char* pow, int base, char *out){
+//potegowanie - wielokrotne mnozenie, usprawnione, zwraca -1 gdy liczba jest za duża
+int power(char* a, char* pow, int base, char *out){
     if(pow[0] == '0'){
         out[0] = 0;
+        return 0;
+    }
+    char temp1[SIZE];
+    char temp2[SIZE];
+    char prev[SIZE];
+    prev[0] = 0;
+    prev[1] = '\0';
+    strcpy(temp1, a);
+    strcpy(temp2, a);
+    int b = change_to_int(pow, base);
+    if(b * strlen(a) > SIZE-1) return -1;
+    int i = 2;
+    while( i <= b )
+    {
+        if(strlen(out) > SIZE || (are_equal(temp1, temp2) && strlen(temp1) >= 42) ) {
+            out[0] = '\0';
+            return -1;}
+        multiply(temp1, temp2, base, out);
+        if(i*2 <= b){
+            strcpy(temp2, out);
+            strcpy(temp1, out);
+            i = i * 2;
+        }
+        else{
+            strcpy(temp2, a);
+            strcpy(temp1, out);
+            i++;
+        }
+        
+    }
+    return 0;
+}
+
+void divide(char* a, char* b, int base, char *out){
+    if(is_greater(b, a)){
+        out[0] = 0;
+        out[1] = '\0';
         return;
     }
     char temp[SIZE];
-    strcpy(temp, a);
-    int b = change_to_int(pow, base);
-
-    if(b == -1){
-        printf("ERROR! the power of %s is too big!", pow);
-        abort;
-    }
-    for(int i = 1; i < b; ++i)
-    {
-        multiply(a, temp, base, out);
-        if(strlen(out) > SIZE ) {
-            printf("ZA DUZA POTEGA ");
-            out[0] = '\0';
-            return;}
-        strcpy(temp, a);
-        strcpy(a, out);
-    }
-    return;
-}
-void divide(char* a, char* b, int base, char *out){
-    char temp[SIZE];
-    char comp[SIZE];
+    temp[0] = '\0';
+    char comp1[SIZE];
+    char comp2[SIZE];
+    strcpy(comp2, b);
+    strcpy(comp1, b);
+    char ref[SIZE];
     out[0] = '\0';
-    comp[0] = '\0';
-    int i = 0;
-    while(are_equal(temp, a) == 0 && strlen(comp) <= strlen(a)){
-        add(comp, b, base, temp);
-        strcpy(comp, temp);
-
-        i++;
+    int do_binary = 1;
+    int i = 1;
+    while(is_greater(a, temp) && !are_equal(a, temp)){
+        if(do_binary){add(comp1, comp2, base, ref);}
+        if(is_greater(a, ref) && do_binary)
+        {
+            strcpy(comp1, ref);
+            strcpy(comp2, ref);
+            strcpy(temp, ref);
+            i = i * 2;
+        }
+        else{
+            do_binary = 0;
+            add(comp1, b, base, temp);
+            strcpy(comp1, temp);
+            i++;
+        }
     }
-    if(strlen(comp) > strlen(a)) return;
-    decichange(i, base, out);
+    if(is_greater(temp, a)) i = i-1;
+    change_f_int(i, base, out);
     return;
-    
 }
+//modulo za pomocą wyszukiwania binarnego
+void modulo(char *a, char *b, int base, char *mid){
+    char prev[SIZE];
+    char n[SIZE];
+    char temp[SIZE];
+
+    divide(a, b, base, n);
+    multiply(b, n, base, prev);
+    if(are_equal(prev, a)){
+        mid[0] = '0';
+        mid[1] = '\0';
+        return;
+    }
+    char head[SIZE];
+    strcpy(head, b);
+    char tail[SIZE];
+    tail[0] = '0';
+    tail[1] = '\0';
+    char sum[SIZE];
+    sum[0] = '\0';
+    temp[0] = '\0';
+    mid[0] = '\0';
+    int j = 0;
+    while(!are_equal(head, tail)){
+
+        sum[0]='\0';
+        add(tail, head, base, sum);        
 
 
-//do zrobienia: modulo
+        divide(sum, "2", base, mid);
+
+        temp[0] ='\0';
+        add(prev, mid, base, temp);
+        if(is_greater(temp, a)){
+            strcpy(head, mid);
+        }
+        else if(are_equal(temp, a)){
+            return;
+        }
+        else if(!is_greater(temp, a)){
+            strcpy(tail, mid);
+        }
+    }
+
+
+    return;
+}
 
 int main() {
     FILE *inf;
@@ -339,10 +445,14 @@ int main() {
             
             fputs(str2, outf);
             fputs("\n\n", outf);
-            power(str, str2, base, out);
-
+            if(power(str, str2, base, out) == 0){
             fputs(out, outf);
             fputs("\n\n", outf);
+            }
+            else {
+                fputs("ERROR! Number is too big! \n\n", outf);
+            
+            }
             continue;
         }
             
@@ -377,7 +487,27 @@ int main() {
             }
             continue;
         }
-        
+        if(str[0] == '%'){
+            
+            fscanf(inf, "%s", base_str);
+
+            fputs(base_str, outf);
+            fputs("\n\n", outf);      
+            base = atoi(base_str);      
+            fscanf(inf, "%s", str);
+            fputs(str, outf);
+            fputs("\n\n", outf);
+            fscanf(inf, "%s", str2);
+            fputs(str2, outf);
+            fputs("\n\n", outf);
+
+            modulo(str, str2, base, out);
+
+            fputs(out, outf);
+            fputs("\n\n", outf);
+            continue;
+        }
+
             
     
     }

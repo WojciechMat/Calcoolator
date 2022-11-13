@@ -1,0 +1,56 @@
+Program służy do wykonywania działań dodawania, potęgowania, zamiany systemu liczbowego, modulo, mnożenia i dzielenia z zaokrągleniem w dół.
+Działa w systemach liczbowych o podstawach od 2 do 16. Maksymalna długość liczb przyjmowanych i zwracanych to 80, muszą być dodatnie.
+
+Dodawanie działa na zasadzie działania pisemnego. cyfry krótszej liczby są dodawane do cyfr dłuższej od końca, jeśli taki wynik jest większy od podstawy systemu,
+do kolejnej sumy dodajemy jedej. Wynik zapisany jest od tyłu więc na koniec obracamy go (funkcją turn).
+Mnożenie działa analogicznie. 
+
+Zamiana podstawy systemu liczbowego polega na wczytywaniu wartości pojedyńczych cyfr liczby wejściowej od prawej strony, 
+mnożeniu ich przez podstawę wejściowej liczby do potęgi i-tej gdy cyfra stoi na i-tym miejsciu od prawej, licząc od i = 0.
+Wartości te są następnie przeliczane na system o pożądanej podstawie (za pomocą funkcji change_f_int) i dodawane do siebie.
+
+Dzielenie polega zliczeniu ile razy dodamy do siebie dzielnik zanim otrzymamy liczbę większą niż dzielna.
+Zapisujemy wartość dzielnika w zmiennej comp1 i comp2 i dodajemy je do siebie po czym wynik zapisujemy znowu w tych zmiennych 
+(czyli mnożymy przez 2) zanim osiągniemy wartość większą od dzielnej. Jeśli nie osiągneliśmy liczby równej dzielnej 
+dodajemy do comp1 dzielnik dopóki nie otrzymamy dzielnej lub liczby większej od dzielnej (wtedy od wyniku odejmujemy 1 - zaokrąglamy w dół).
+
+Potęgowanie polega na mnożeniu pierwszej liczby przez siebie samą ilość razy równą drugiej liczbie (wykładnikowi).
+Zapisujemy tę liczbę w tablicach temp1 i temp2, ilość przemnożeń zapisujemy w zmiennej i. Dopóki i*2 nie przekracza wartości wykładnika
+zapisujemy wynik mnożenia temp1 i temp2 w temp1 i w temp2 i mnożymy dalej (czyli podnosimy każdy następny temp1 do potęgi drugiej, przypisujemy i = i*2).
+Zanim i*2 będzie większe od wykładnika, w temp2 zapisujemy wartość pierwszej liczby i mnożymy dopóki i jest mniejsze od wykładnika(przypisujemy i = i + 1).
+
+Funkcja modulo szuka binarnie modulo pomiędzy największą wielokotnością drugiej liczby mniejszą od pierwszej,
+a najmniejszą wielokrotnością drugiej liczby większą od pierwszej.
+
+
+Kompilacja:
+Kompilując program za pomocą gcc należy wskazać, że korzysta on z biblioteki math. Np:
+gcc source.c -o calc.o -lm
+Użytkowanie:
+Jako dane wejściowe program przyjmuje plik o nazwie in.txt znajdujący się w tym samym folderze co plik wykonywalny.
+Każde działanie (poza zamianą systemu) w pliku in.txt powinno być zapisane w następujący sposób (// - pominąć):
+
+<znak działania> <podstawa systemu liczbowego>
+
+<pierwsza liczba w działaniu>
+
+<druga liczba w działaniu>
+
+//miejsce na odpowiedz 
+
+<znak działania>(itd...)
+
+Zamiana systemu musi mieć w pliku in.txt postać:
+
+<podstawa systemu wczytywanej liczby> <podstawa systemu do którego chcemy przekonwertować liczbę>
+
+<liczba>
+
+//miejsce na odpowiedz
+
+itd. wg powyższego schematu.
+
+Wynikiem działania programu jest plik out.txt zawierający treść pliku in.txt uzupełnioną o wyniki działań.
+Przykładowe pliki wejściowe i wyjściowe znajdują się w folderze examples.
+
+v1.0.0
