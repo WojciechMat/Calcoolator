@@ -8,6 +8,28 @@ const int SIZE = 82;
 
 char* nums = "0123456789ABCDEF";
 
+void format(char *in, char *out){
+    int n = strlen(in);
+    int i = 0;
+    while(in[i] == '0' && in[i] != '\0'){
+        i++;
+    }
+    if(in[i] == '\0'){
+        out[0] = '0';
+        out[1] = '\0';
+    }
+    else {
+        int j = 0;
+        while(in[i] != '\0')
+        {
+            out[j] = in[i];
+            i++;
+            j++;
+        }
+        out[j] = '\0';
+    }
+    return;
+}
 int val(char a){
     switch (a)
     {
@@ -347,11 +369,11 @@ void modulo(char *a, char *b, int base, char *mid){
     return;
 }
 
-int main() {
+int main(int atgc, char *argv[]) {
     FILE *inf;
     FILE *outf;
     //FILE *out;
-    char *in_path = "in.txt";
+    char *in_path = argv[1];
     char *out_path = "out.txt";
     inf = fopen(in_path, "r");
     outf = fopen(out_path, "w");
@@ -378,7 +400,11 @@ int main() {
             fscanf(inf, "%s", str);
             fputs(str, outf);
             fputs("\n\n", outf);
-            change(str, base, base2, out);
+
+            char in1[SIZE];
+            format(str, in1);
+
+            change(in1, base, base2, out);
             fputs(out, outf);
             fputs("\n\n", outf);
             continue;
@@ -402,7 +428,12 @@ int main() {
             fputs(str2, outf);
             fputs("\n\n", outf);
 
-            add(str, str2, base, out);
+            char in1[SIZE];
+            format(str, in1);
+            char in2[SIZE];
+            format(str2, in2);
+
+            add(in1, in2, base, out);
             
             fputs(out, outf);
             fputs("\n\n", outf);
@@ -424,7 +455,13 @@ int main() {
             fscanf(inf, "%s", str2);
             fputs(str2, outf);
             fputs("\n\n", outf);
-            multiply(str, str2, base, out);
+
+            char in1[SIZE];
+            format(str, in1);
+            char in2[SIZE];
+            format(str2, in2);
+
+            multiply(in1, in2, base, out);
             fputs(out, outf);
             fputs("\n\n", outf);
             continue;
@@ -445,7 +482,11 @@ int main() {
             
             fputs(str2, outf);
             fputs("\n\n", outf);
-            if(power(str, str2, base, out) == 0){
+            char in1[SIZE];
+            format(str, in1);
+            char in2[SIZE];
+            format(str2, in2);
+            if(power(in1, in2, base, out) == 0){
             fputs(out, outf);
             fputs("\n\n", outf);
             }
@@ -475,7 +516,12 @@ int main() {
             fputs(str2, outf);
             fputs("\n\n", outf);
 
-            divide(str, str2, base, out);
+            char in1[SIZE];
+            format(str, in1);
+            char in2[SIZE];
+            format(str2, in2);
+
+            divide(in1, in2, base, out);
             
             if(out[0] == '\0'){
                 fputs("undividable", outf);
@@ -501,7 +547,12 @@ int main() {
             fputs(str2, outf);
             fputs("\n\n", outf);
 
-            modulo(str, str2, base, out);
+            char in1[SIZE];
+            format(str, in1);
+            char in2[SIZE];
+            format(str2, in2);
+
+            modulo(in1, in2, base, out);
 
             fputs(out, outf);
             fputs("\n\n", outf);
