@@ -24,7 +24,7 @@ a najmniejszą wielokrotnością drugiej liczby większą od pierwszej.
 
 Kompilacja:
 Kompilując program za pomocą gcc należy wskazać, że korzysta on z biblioteki math. Np:
-gcc source.c -o calc.o -lm
+gcc mw_count.c -o mw_count.o -lm
 Użytkowanie:
 Jako dane wejściowe program przyjmuje plik którego ścieżka zostanie podana jako argument przy uruchamianiu programu.
 Każde działanie (poza zamianą systemu) w pliku in.txt powinno być zapisane w następujący sposób (// - pominąć):
@@ -49,7 +49,7 @@ Zamiana systemu musi mieć w pliku in.txt postać:
 
 itd. wg powyższego schematu.
 
-Wynikiem działania programu jest plik out.txt zawierający treść pliku in.txt uzupełnioną o wyniki działań.
+Wynikiem działania programu jest plik out.txt zawierający treść pliku wejściowego uzupełnioną o wyniki działań.
 Przykładowe pliki wejściowe i wyjściowe znajdują się w folderze examples.
 
 v1.1.0
