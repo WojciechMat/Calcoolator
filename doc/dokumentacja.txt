@@ -10,9 +10,8 @@ mnożeniu ich przez podstawę wejściowej liczby do potęgi i-tej gdy cyfra stoi
 Wartości te są następnie przeliczane na system o pożądanej podstawie (za pomocą funkcji change_f_int) i dodawane do siebie.
 
 Dzielenie polega zliczeniu ile razy dodamy do siebie dzielnik zanim otrzymamy liczbę większą niż dzielna.
-Zapisujemy wartość dzielnika w zmiennej comp1 i comp2 i dodajemy je do siebie po czym wynik zapisujemy znowu w tych zmiennych 
-(czyli mnożymy przez 2) zanim osiągniemy wartość większą od dzielnej. Jeśli nie osiągneliśmy liczby równej dzielnej 
-dodajemy do comp1 dzielnik dopóki nie otrzymamy dzielnej lub liczby większej od dzielnej (wtedy od wyniku odejmujemy 1 - zaokrąglamy w dół).
+Najpierw szukamy do jakiej najwyższej potęgi możemy podnieść dzielnik zanim otrzymamy dzielną, potem sprawdzamy
+ile razy możemy dodać którą mniejszą potęgę.
 
 Potęgowanie polega na mnożeniu pierwszej liczby przez siebie samą ilość razy równą drugiej liczbie (wykładnikowi).
 Zapisujemy tę liczbę w tablicach temp1 i temp2, ilość przemnożeń zapisujemy w zmiennej i. Dopóki i*2 nie przekracza wartości wykładnika
@@ -27,7 +26,7 @@ Kompilacja:
 Kompilując program za pomocą gcc należy wskazać, że korzysta on z biblioteki math. Np:
 gcc source.c -o calc.o -lm
 Użytkowanie:
-Jako dane wejściowe program przyjmuje plik o nazwie in.txt znajdujący się w tym samym folderze co plik wykonywalny.
+Jako dane wejściowe program przyjmuje plik którego ścieżka zostanie podana jako argument przy uruchamianiu programu.
 Każde działanie (poza zamianą systemu) w pliku in.txt powinno być zapisane w następujący sposób (// - pominąć):
 
 <znak działania> <podstawa systemu liczbowego>
@@ -53,4 +52,4 @@ itd. wg powyższego schematu.
 Wynikiem działania programu jest plik out.txt zawierający treść pliku in.txt uzupełnioną o wyniki działań.
 Przykładowe pliki wejściowe i wyjściowe znajdują się w folderze examples.
 
-v1.0.0
+v1.1.0

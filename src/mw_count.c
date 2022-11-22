@@ -4,13 +4,13 @@
 #include<stdio.h>
 #include<stdlib.h>
 const int SIZE = 82;
-//do zrobienia: czas obliczen
 
 char* nums = "0123456789ABCDEF";
 
-void format(char *in, char *out){
+void format(char *in){
     int n = strlen(in);
     int i = 0;
+    char out[SIZE];
     while(in[i] == '0' && in[i] != '\0'){
         i++;
     }
@@ -28,6 +28,7 @@ void format(char *in, char *out){
         }
         out[j] = '\0';
     }
+    strcpy(in, out);
     return;
 }
 int val(char a){
@@ -150,7 +151,11 @@ int are_equal(char* a, char*b){
     return 1;
 }
 void change_f_int (int a, int to_base, char* out){
-
+    if(a == 0){
+        out[0] = '0';
+        out[1] = '\0';
+        return;
+    }
     int i = 0;
     int num = 0;        
     while(a > 0){
@@ -250,8 +255,19 @@ void multiply(char* a_in, char* b_in, int base, char *out){
 }
 //potegowanie - wielokrotne mnozenie, usprawnione, zwraca -1 gdy liczba jest za duża
 int power(char* a, char* pow, int base, char *out){
-    if(pow[0] == '0'){
-        out[0] = 0;
+    if(pow[0] == '0'&&pow[1] == '\0'){
+        out[0] = '1';
+        out[1] = '\0';
+        return 0;
+    }
+
+     if(pow[0] == '1'&&pow[1] == '\0'){
+        strcpy(out, a);
+        return 0;
+    }
+    if(a[0] == '1' && a[1] == '\0'){
+        out[0] = '1';
+        out[1] = '\0';
         return 0;
     }
     char temp1[SIZE];
@@ -284,7 +300,23 @@ int power(char* a, char* pow, int base, char *out){
     }
     return 0;
 }
+void sub_one(char *a, int base){
+    int a_iter = strlen(a);
+    int i = 0;
+    while(a_iter >= 0 && a[a_iter] == '0'){
+        a_iter-=1;
+    }
+    int value = val(a[a_iter]) - 1;
+    a[a_iter] = nums[value];
+    a_iter++;
+    while(a_iter < strlen(a))
+    {
+        a[a_iter] = nums[base-1];
+    }
+    format(a);
 
+}
+//dzielenie szybkie
 void divide(char* a, char* b, int base, char *out){
     if(is_greater(b, a)){
         out[0] = 0;
@@ -299,26 +331,55 @@ void divide(char* a, char* b, int base, char *out){
     strcpy(comp1, b);
     char ref[SIZE];
     out[0] = '\0';
-    int do_binary = 1;
-    int i = 1;
-    while(is_greater(a, temp) && !are_equal(a, temp)){
-        if(do_binary){add(comp1, comp2, base, ref);}
-        if(is_greater(a, ref) && do_binary)
+    int do_exponentially = 1;
+    int i = 0;
+    int exp = 1;
+    char count[SIZE];
+    count[0] = '1';
+    count[1] = '\0';
+    char temp2[SIZE];
+    temp2[0] = '\0';
+    int c = 0;
+    int c2 = 1;
+    char exponent[SIZE];
+    int j = 0;
+    while(is_greater(a, temp) && !are_equal(a, temp) && exp > 0){
+        if(do_exponentially){multiply(comp1, b, base, ref); exp++;}
+        if(!is_greater(ref, a) && do_exponentially)
         {
             strcpy(comp1, ref);
-            strcpy(comp2, ref);
             strcpy(temp, ref);
-            i = i * 2;
+            multiply(count, b, base, temp2);
+            strcpy(count, temp2);
+            c = change_to_int(count, base) - 1;
+
         }
         else{
-            do_binary = 0;
-            add(comp1, b, base, temp);
-            strcpy(comp1, temp);
-            i++;
+            change_f_int(exp, base, temp2);
+            power(b, temp2, base, comp2);
+            add(comp1, comp2, base, ref ); 
+            do_exponentially = 0;
+
+            if(!is_greater(ref, a)){
+                
+                change_f_int(exp-1, base, exponent);
+                power(b, exponent , base, comp2);
+                strcpy(comp1, ref );
+                strcpy(temp, ref);
+                add(count, comp2, base, temp2);
+                strcpy(count, temp2);
+            }
+            else{
+                c-=1;
+                exp-=1;
+                if(exp == 0) break;
+            }
         }
+
     }
-    if(is_greater(temp, a)) i = i-1;
-    change_f_int(i, base, out);
+    strcpy(out, count);
+    count[0] = '\0';
+    if(is_greater(temp, a)) sub_one(out, base);
     return;
 }
 //modulo za pomocą wyszukiwania binarnego
@@ -334,6 +395,7 @@ void modulo(char *a, char *b, int base, char *mid){
         mid[1] = '\0';
         return;
     }
+    
     char head[SIZE];
     strcpy(head, b);
     char tail[SIZE];
@@ -401,10 +463,9 @@ int main(int atgc, char *argv[]) {
             fputs(str, outf);
             fputs("\n\n", outf);
 
-            char in1[SIZE];
-            format(str, in1);
+            format(str);
 
-            change(in1, base, base2, out);
+            change(str, base, base2, out);
             fputs(out, outf);
             fputs("\n\n", outf);
             continue;
@@ -428,12 +489,10 @@ int main(int atgc, char *argv[]) {
             fputs(str2, outf);
             fputs("\n\n", outf);
 
-            char in1[SIZE];
-            format(str, in1);
-            char in2[SIZE];
-            format(str2, in2);
+            format(str);
+            format(str2);
 
-            add(in1, in2, base, out);
+            add(str, str2, base, out);
             
             fputs(out, outf);
             fputs("\n\n", outf);
@@ -456,12 +515,10 @@ int main(int atgc, char *argv[]) {
             fputs(str2, outf);
             fputs("\n\n", outf);
 
-            char in1[SIZE];
-            format(str, in1);
-            char in2[SIZE];
-            format(str2, in2);
+            format(str);
+            format(str2);
 
-            multiply(in1, in2, base, out);
+            multiply(str, str2, base, out);
             fputs(out, outf);
             fputs("\n\n", outf);
             continue;
@@ -482,11 +539,11 @@ int main(int atgc, char *argv[]) {
             
             fputs(str2, outf);
             fputs("\n\n", outf);
-            char in1[SIZE];
-            format(str, in1);
-            char in2[SIZE];
-            format(str2, in2);
-            if(power(in1, in2, base, out) == 0){
+            
+            format(str);
+            
+            format(str2);
+            if(power(str, str2, base, out) == 0){
             fputs(out, outf);
             fputs("\n\n", outf);
             }
@@ -516,12 +573,10 @@ int main(int atgc, char *argv[]) {
             fputs(str2, outf);
             fputs("\n\n", outf);
 
-            char in1[SIZE];
-            format(str, in1);
-            char in2[SIZE];
-            format(str2, in2);
+            format(str);
+            format(str2);
 
-            divide(in1, in2, base, out);
+            divide(str, str2, base, out);
             
             if(out[0] == '\0'){
                 fputs("undividable", outf);
@@ -547,12 +602,9 @@ int main(int atgc, char *argv[]) {
             fputs(str2, outf);
             fputs("\n\n", outf);
 
-            char in1[SIZE];
-            format(str, in1);
-            char in2[SIZE];
-            format(str2, in2);
-
-            modulo(in1, in2, base, out);
+            format(str);
+            format(str2);
+            modulo(str, str2, base, out);
 
             fputs(out, outf);
             fputs("\n\n", outf);
