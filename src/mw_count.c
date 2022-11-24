@@ -436,7 +436,25 @@ int main(int atgc, char *argv[]) {
     FILE *outf;
     //FILE *out;
     char *in_path = argv[1];
-    char *out_path = "out.txt";
+    char outpth0[SIZE];
+    strcpy(outpth0, argv[1]);
+    for(int i = 0; i< strlen(outpth0)-1; i++)
+    {
+
+        if(outpth0[i]=='i' && outpth0[i+1] == 'n'){
+            outpth0[i] = '\0';
+            break;
+            } 
+        if(outpth0[i]=='.'){
+            outpth0[i] = '_';
+            outpth0[i+1]='\0';
+            break;
+        
+        }
+            
+    }
+    char out_path[SIZE];
+    sprintf(out_path, "%sout.txt", outpth0);
     inf = fopen(in_path, "r");
     outf = fopen(out_path, "w");
     char base_str[SIZE];
