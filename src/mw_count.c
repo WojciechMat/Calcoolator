@@ -11,7 +11,7 @@ void format(char *in){
     int n = strlen(in);
     int i = 0;
     char out[SIZE];
-    while(in[i] == '0' && in[i] != '\0'){
+    while(in[i] == '0'){
         i++;
     }
     if(in[i] == '\0'){
@@ -20,13 +20,12 @@ void format(char *in){
     }
     else {
         int j = 0;
-        while(in[i] != '\0')
+        while(in[i+1] != '\0')
         {
             out[j] = in[i];
             i++;
             j++;
         }
-        out[j] = '\0';
     }
     strcpy(in, out);
     return;
@@ -88,29 +87,25 @@ int is_greater(char *greater, char *less){
     return 0;
 }
 //dodawanie pisemne
-void add(char *a_in, char *b_in, int base, char *sum){
+void add(char *a, char *b, int base, char *sum){
     int swapped = 0;
-    if(strlen(a_in) < strlen(b_in))
+    if(strlen(a) < strlen(b))
     {
-        swap(&a_in, &b_in);
+        swap(&a, &b);
         swapped = 1;
     }
-    char a[SIZE];
-    char b[SIZE];
-    strcpy(a, a_in);
-    strcpy(b, b_in);
     int a_iter = strlen(a)-1;
     int b_iter = strlen(b)-1;
     int i = 0;
-    int num = 0;
-    int car = 0;
+    int num = 0; 
+    int car = 0; //carried value
     while(a_iter>=0 && b_iter>=0){
         num = (val(a[a_iter]) + val(b[b_iter]) + car) % base;
         car = (val(a[a_iter]) + val(b[b_iter]) + car) / base;
         
         sum[i] = nums[num];
         i++;
-        a_iter -=1 ;
+        a_iter -= 1 ;
         b_iter -= 1;
         
     }
@@ -119,7 +114,7 @@ void add(char *a_in, char *b_in, int base, char *sum){
         while(a_iter >= 0){
             num = (val(a[a_iter]) + car) % base;
             car = (val(a[a_iter]) + car) / base;
-            a_iter-=1;
+            a_iter -= 1;
             sum[i] = nums[num];
             i++;
         }
@@ -128,17 +123,18 @@ void add(char *a_in, char *b_in, int base, char *sum){
     sum[i] = '\0';
     turn(sum);
     if(swapped){
-        swap(&a_in, &b_in);
+        swap(&a, &b);
     } 
     return;
 }
+
 int change_to_int(char *a, int base){
     int iter = strlen(a) - 1;
     int out = 0;
     int i = 0;
     while(iter >= 0){
         out += val(a[iter]) * pow(base, i);
-        iter-=1;
+        iter -= 1;
         i++;
     }
     return out;
@@ -150,7 +146,7 @@ int are_equal(char* a, char*b){
     }
     return 1;
 }
-void change_f_int (int a, int to_base, char* out){
+void change_from_int (int a, int to_base, char* out){
     if(a == 0){
         out[0] = '0';
         out[1] = '\0';
@@ -173,38 +169,34 @@ void change(char *a, int from_base, int to_base, char *out){
     int a_iter = strlen(a) - 1;
     int num = 0;
     int i = 0;
-    char comp[SIZE];
-    char temp_out[SIZE];
-    char tab[SIZE];
-    comp[0] = '\0';
-    temp_out[0] = '\0';
+    char single_value[SIZE];
+    char sum[SIZE];
+    char temp[SIZE];
+    single_value[0] = '\0';
+    sum[0] = '\0';
     while ( a_iter >= 0 ){
         num = (val(a[a_iter]) *(int)pow(from_base, i));
         
-        change_f_int(num, to_base, comp);       
+        change_from_int(num, to_base, single_value);       
         
-        add(temp_out, comp, to_base, tab);
-        strcpy(temp_out, tab);
+        add(sum, single_value, to_base, temp);
+        strcpy(sum, temp);
 
-        a_iter-=1;
+        a_iter -= 1;
         i++;
     }
     
-    strcpy(out, temp_out);
+    strcpy(out, sum);
     return;
 }   
 //mnozenie pisemne
-void multiply(char* a_in, char* b_in, int base, char *out){
+void multiply(char* a, char* b, int base, char *out){
     int swapped = 0;
-    if(strlen(a_in) < strlen(b_in))
+    if(strlen(a) < strlen(b))
     {
-        swap(&a_in, &b_in);
+        swap(&a, &b);
         swapped = 1;
     }
-    char a[SIZE];
-    char b[SIZE];
-    strcpy(a, a_in);
-    strcpy(b, b_in);
     int a_iter = strlen(a)-1;
     int b_iter = strlen(b)-1;
     int i = 0;
@@ -213,16 +205,16 @@ void multiply(char* a_in, char* b_in, int base, char *out){
     char temp_out[SIZE];
     temp_out[0] = '0';
     temp_out[1] = '\0';        
-    int k = 0;
+    int comp_zeros = 0;
 
     while(b_iter >= 0)
     {
         if(b[b_iter] != '0'){
+            
             i = 0;
             car = 0;
-
             char comp[SIZE];
-            for(int j = 0; j < k; j++){
+            for(int j = 0; j < comp_zeros; j++){
                 comp[i] = '0';
                 i++;
             }
@@ -237,19 +229,19 @@ void multiply(char* a_in, char* b_in, int base, char *out){
             } 
             if(car > 0){ comp[i] = nums[car]; i++; }
             comp[i] = '\0';
-            char tab[SIZE];
+            char temp[SIZE];
             turn(comp);
-            add(temp_out, comp, base, tab);
-            strcpy(temp_out, tab);
+            add(temp_out, comp, base, temp);
+            strcpy(temp_out, temp);
         }
         a_iter = strlen(a) - 1;
         b_iter -= 1;
-        k++;
+        comp_zeros++;
 
     }
     strcpy(out, temp_out);
     if(swapped){
-        swap(&a_in, &b_in);
+        swap(&a, &b);
     }
     return;
 }
@@ -319,60 +311,61 @@ void sub_one(char *a, int base){
 //dzielenie szybkie
 void divide(char* a, char* b, int base, char *out){
     if(is_greater(b, a)){
-        out[0] = 0;
+        out[0] = '0';
         out[1] = '\0';
+        return;
+    }
+    if(b[0] == '1' && b[1] == '\0'){
+        strcpy(out, a);
         return;
     }
     char temp[SIZE];
     temp[0] = '\0';
     char comp1[SIZE];
     char comp2[SIZE];
-    strcpy(comp2, b);
     strcpy(comp1, b);
     char ref[SIZE];
     out[0] = '\0';
     int do_exponentially = 1;
-    int i = 0;
-    int exp = 1;
+    int exp_dec = 1;
     char count[SIZE];
     count[0] = '1';
     count[1] = '\0';
     char temp2[SIZE];
     temp2[0] = '\0';
-    int c = 0;
-    int c2 = 1;
-    char exponent[SIZE];
-    int j = 0;
-    while(is_greater(a, temp) && !are_equal(a, temp) && exp > 0){
-        if(do_exponentially){multiply(comp1, b, base, ref); exp++;}
+    int count_dec = 0;
+    char exp[SIZE];
+    while(is_greater(a, temp) && exp_dec > 0){
+        if(do_exponentially) { multiply(comp1, b, base, ref); exp_dec++; }
         if(!is_greater(ref, a) && do_exponentially)
         {
             strcpy(comp1, ref);
             strcpy(temp, ref);
             multiply(count, b, base, temp2);
             strcpy(count, temp2);
-            c = change_to_int(count, base) - 1;
+            count_dec = change_to_int(count, base) - 1;
 
         }
-        else{
-            change_f_int(exp, base, temp2);
+        else
+        {
+            change_from_int(exp_dec, base, temp2);
             power(b, temp2, base, comp2);
             add(comp1, comp2, base, ref ); 
             do_exponentially = 0;
 
             if(!is_greater(ref, a)){
                 
-                change_f_int(exp-1, base, exponent);
-                power(b, exponent , base, comp2);
+                change_from_int(exp_dec-1, base, exp);
+                power(b, exp , base, comp2);
                 strcpy(comp1, ref );
                 strcpy(temp, ref);
                 add(count, comp2, base, temp2);
                 strcpy(count, temp2);
             }
             else{
-                c-=1;
-                exp-=1;
-                if(exp == 0) break;
+                count_dec-=1;
+                exp_dec-=1;
+                if(exp_dec == 0) break;
             }
         }
 
@@ -386,7 +379,6 @@ void divide(char* a, char* b, int base, char *out){
 void modulo(char *a, char *b, int base, char *mid){
     char prev[SIZE];
     char n[SIZE];
-    char temp[SIZE];
 
     divide(a, b, base, n);
     multiply(b, n, base, prev);
@@ -395,7 +387,7 @@ void modulo(char *a, char *b, int base, char *mid){
         mid[1] = '\0';
         return;
     }
-    
+    char temp[SIZE];
     char head[SIZE];
     strcpy(head, b);
     char tail[SIZE];
@@ -405,7 +397,6 @@ void modulo(char *a, char *b, int base, char *mid){
     sum[0] = '\0';
     temp[0] = '\0';
     mid[0] = '\0';
-    int j = 0;
     while(!are_equal(head, tail)){
 
         sum[0]='\0';
