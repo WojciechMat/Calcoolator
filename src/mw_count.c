@@ -3,33 +3,11 @@
 #include<math.h>
 #include<stdio.h>
 #include<stdlib.h>
-const int SIZE = 82;
 
+const int SIZE = 82;
 char* nums = "0123456789ABCDEF";
 
-void format(char *in){
-    int n = strlen(in);
-    int i = 0;
-    char out[SIZE];
-    while(in[i] == '0'){
-        i++;
-    }
-    if(in[i] == '\0'){
-        out[0] = '0';
-        out[1] = '\0';
-    }
-    else {
-        int j = 0;
-        while(in[i+1] != '\0')
-        {
-            out[j] = in[i];
-            i++;
-            j++;
-        }
-    }
-    strcpy(in, out);
-    return;
-}
+
 int val(char a){
     switch (a)
     {
@@ -52,9 +30,34 @@ int val(char a){
         return 15;
         break;
     default:
+        if(a-48 < 0 || a-48 > 9) return -1;
         return a-48;
         break;
     }
+}
+int format(char *in, int base){
+    int n = strlen(in);
+    int i = 0;
+    char out[SIZE];
+    while(in[i] == '0'){
+        i++;
+    }
+    if(in[i] == '\0'){
+        out[0] = '0';
+        out[1] = '\0';
+    }
+    else {
+        int j = 0;
+        while(in[i+1] != '\0')
+        {
+            if(val(in[i]) >= base || val(in[i] == -1)) return -1;
+            out[j] = in[i];
+            i++;
+            j++;
+        }
+    }
+    strcpy(in, out);
+    return 0;
 }
 void turn(char* str){
     char temp[SIZE];
@@ -190,7 +193,7 @@ void change(char *a, int from_base, int to_base, char *out){
     return;
 }   
 //mnozenie pisemne
-void multiply(char* a, char* b, int base, char *out){
+int multiply(char* a, char* b, int base, char *out){
     int swapped = 0;
     if(strlen(a) < strlen(b))
     {
@@ -243,11 +246,12 @@ void multiply(char* a, char* b, int base, char *out){
     if(swapped){
         swap(&a, &b);
     }
-    return;
+    return 0;
 }
 //potegowanie - wielokrotne mnozenie, usprawnione, zwraca -1 gdy liczba jest za duża
 int power(char* a, char* pow, int base, char *out){
     if(pow[0] == '0'&&pow[1] == '\0'){
+        if(a[0]=='0'&&a[1]=='\0') return -1;
         out[0] = '1';
         out[1] = '\0';
         return 0;
@@ -292,24 +296,8 @@ int power(char* a, char* pow, int base, char *out){
     }
     return 0;
 }
-void sub_one(char *a, int base){
-    int a_iter = strlen(a);
-    int i = 0;
-    while(a_iter >= 0 && a[a_iter] == '0'){
-        a_iter-=1;
-    }
-    int value = val(a[a_iter]) - 1;
-    a[a_iter] = nums[value];
-    a_iter++;
-    while(a_iter < strlen(a))
-    {
-        a[a_iter] = nums[base-1];
-    }
-    format(a);
-
-}
 //dzielenie szybkie
-void divide(char* a, char* b, int base, char *out){
+int divide(char* a, char* b, int base, char *out){
     if(is_greater(b, a)){
         out[0] = '0';
         out[1] = '\0';
@@ -317,7 +305,10 @@ void divide(char* a, char* b, int base, char *out){
     }
     if(b[0] == '1' && b[1] == '\0'){
         strcpy(out, a);
-        return;
+        return 0;
+    }
+    if(b[0] == 0) {
+        return -1;
     }
     char temp[SIZE];
     temp[0] = '\0';
@@ -372,15 +363,14 @@ void divide(char* a, char* b, int base, char *out){
     }
     strcpy(out, count);
     count[0] = '\0';
-    if(is_greater(temp, a)) sub_one(out, base);
-    return;
+    return 0;
 }
 //modulo za pomocą wyszukiwania binarnego
-void modulo(char *a, char *b, int base, char *mid){
+int modulo(char *a, char *b, int base, char *mid){
     char prev[SIZE];
     char n[SIZE];
 
-    divide(a, b, base, n);
+    if(divide(a, b, base, n) == -1) return -1;
     multiply(b, n, base, prev);
     if(are_equal(prev, a)){
         mid[0] = '0';
@@ -411,7 +401,7 @@ void modulo(char *a, char *b, int base, char *mid){
             strcpy(head, mid);
         }
         else if(are_equal(temp, a)){
-            return;
+            return 0;
         }
         else if(!is_greater(temp, a)){
             strcpy(tail, mid);
@@ -419,7 +409,7 @@ void modulo(char *a, char *b, int base, char *mid){
     }
 
 
-    return;
+    return 0;
 }
 
 int main(int atgc, char *argv[]) {
@@ -472,11 +462,14 @@ int main(int atgc, char *argv[]) {
             fputs(str, outf);
             fputs("\n\n", outf);
 
-            format(str);
-
-            change(str, base, base2, out);
-            fputs(out, outf);
-            fputs("\n\n", outf);
+            if(format(str, base) == -1){
+                fputs("ERROR! Invalid data \n\n", outf);
+            }
+            else{
+                change(str, base, base2, out);
+                fputs(out, outf);
+                fputs("\n\n", outf);
+            }
             continue;
         }
         if(str[0] == '+'){
@@ -497,14 +490,16 @@ int main(int atgc, char *argv[]) {
             
             fputs(str2, outf);
             fputs("\n\n", outf);
+            if(format(str, base)==-1 || format(str2, base) == -1){
+                fputs("ERROR! Invalid data \n\n", outf);
+            }
+            else{
 
-            format(str);
-            format(str2);
-
-            add(str, str2, base, out);
-            
-            fputs(out, outf);
-            fputs("\n\n", outf);
+                add(str, str2, base, out);
+                
+                fputs(out, outf);
+                fputs("\n\n", outf);
+            }
             continue;
         }
         if(str[0] == '*'){
@@ -523,15 +518,15 @@ int main(int atgc, char *argv[]) {
             fscanf(inf, "%s", str2);
             fputs(str2, outf);
             fputs("\n\n", outf);
-
-            format(str);
-            format(str2);
-
-            multiply(str, str2, base, out);
-            fputs(out, outf);
-            fputs("\n\n", outf);
+            if(format(str, base)==-1 || format(str2, base) == -1){
+                fputs("ERROR! Invalid data \n\n", outf);
+            }
+            else{
+                multiply(str, str2, base, out);
+                fputs(out, outf);
+                fputs("\n\n", outf);
+            }
             continue;
-            
         }
         if(str[0] == '^'){
             fscanf(inf, "%s", base_str);
@@ -548,17 +543,18 @@ int main(int atgc, char *argv[]) {
             
             fputs(str2, outf);
             fputs("\n\n", outf);
-            
-            format(str);
-            
-            format(str2);
-            if(power(str, str2, base, out) == 0){
-            fputs(out, outf);
-            fputs("\n\n", outf);
+            if(format(str, base)==-1 || format(str2, base) == -1){
+                fputs("ERROR! Invalid data \n\n", outf);
             }
-            else {
-                fputs("ERROR! Number is too big! \n\n", outf);
-            
+            else{
+                if(power(str, str2, base, out) == -1){
+                fputs("ERROR! Invalid data \n\n", outf);
+                
+                }
+                else {
+                    fputs(out, outf);
+                    fputs("\n\n", outf);
+                }
             }
             continue;
         }
@@ -581,19 +577,20 @@ int main(int atgc, char *argv[]) {
             
             fputs(str2, outf);
             fputs("\n\n", outf);
-
-            format(str);
-            format(str2);
-
-            divide(str, str2, base, out);
-            
-            if(out[0] == '\0'){
-                fputs("undividable", outf);
-                fputs("\n\n", outf);
+            if(format(str, base)==-1 || format(str2, base) == -1){
+                fputs("ERROR! Invalid data \n\n", outf);
             }
-            else {
-                fputs(out, outf);
-                fputs("\n\n", outf);
+            else{
+
+                
+                if(divide(str, str2, base, out) == -1){
+                    fputs("Error! Invalid data", outf);
+                    fputs("\n\n", outf);
+                }
+                else {
+                    fputs(out, outf);
+                    fputs("\n\n", outf);
+                }
             }
             continue;
         }
@@ -611,12 +608,18 @@ int main(int atgc, char *argv[]) {
             fputs(str2, outf);
             fputs("\n\n", outf);
 
-            format(str);
-            format(str2);
-            modulo(str, str2, base, out);
-
-            fputs(out, outf);
-            fputs("\n\n", outf);
+            if(format(str, base)==-1 || format(str2, base) == -1){
+                fputs("ERROR! Invalid data \n\n", outf);
+            }
+            else{
+                if(modulo(str, str2, base, out) == -1){
+                    fputs("ERROR! Invalid data \n\n", outf);
+                }
+                else{
+                    fputs(out, outf);
+                    fputs("\n\n", outf);
+                }
+            }
             continue;
         }
 
