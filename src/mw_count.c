@@ -30,7 +30,7 @@ int val(char a){
         return 15;
         break;
     default:
-        if(a-48 < 0 || a-48 > 9) return -1;
+        if((a-48 < 0 || a-48 > 9) && (a < 65 || a > 70)) return -1;
         return a-48;
         break;
     }
@@ -48,17 +48,17 @@ int format(char *in, int base){
     }
     else {
         int j = 0;
-        while(in[i+1] != '\0')
+        while(in[i] != '\0')
         {
-            if(val(in[i]) >= base || val(in[i] == -1)){
-                 return -1;
-                 out[0]='\0';
+            if(val(in[i]) >= base || val(in[i]) == -1){
+                return -1;
             }
             out[j] = in[i];
             i++;
             j++;
         }
     }
+    out[i]='\0';
     strcpy(in, out);
     return 0;
 }
