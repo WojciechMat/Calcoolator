@@ -50,7 +50,10 @@ int format(char *in, int base){
         int j = 0;
         while(in[i+1] != '\0')
         {
-            if(val(in[i]) >= base || val(in[i] == -1)) return -1;
+            if(val(in[i]) >= base || val(in[i] == -1)){
+                 return -1;
+                 out[0]='\0';
+            }
             out[j] = in[i];
             i++;
             j++;
@@ -90,7 +93,7 @@ int is_greater(char *greater, char *less){
     return 0;
 }
 //dodawanie pisemne
-void add(char *a, char *b, int base, char *sum){
+int add(char *a, char *b, int base, char *sum){
     int swapped = 0;
     if(strlen(a) < strlen(b))
     {
@@ -128,7 +131,7 @@ void add(char *a, char *b, int base, char *sum){
     if(swapped){
         swap(&a, &b);
     } 
-    return;
+    return 0;
 }
 
 int change_to_int(char *a, int base){
@@ -168,7 +171,7 @@ void change_from_int (int a, int to_base, char* out){
     return;
 }
 //zamiana podstawy systemu
-void change(char *a, int from_base, int to_base, char *out){ 
+int change(char *a, int from_base, int to_base, char *out){ 
     int a_iter = strlen(a) - 1;
     int num = 0;
     int i = 0;
@@ -190,7 +193,7 @@ void change(char *a, int from_base, int to_base, char *out){
     }
     
     strcpy(out, sum);
-    return;
+    return 0;
 }   
 //mnozenie pisemne
 int multiply(char* a, char* b, int base, char *out){
@@ -301,7 +304,7 @@ int divide(char* a, char* b, int base, char *out){
     if(is_greater(b, a)){
         out[0] = '0';
         out[1] = '\0';
-        return;
+        return 0;
     }
     if(b[0] == '1' && b[1] == '\0'){
         strcpy(out, a);
@@ -375,7 +378,7 @@ int modulo(char *a, char *b, int base, char *mid){
     if(are_equal(prev, a)){
         mid[0] = '0';
         mid[1] = '\0';
-        return;
+        return 0;
     }
     char temp[SIZE];
     char head[SIZE];
